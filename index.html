@@ -949,6 +949,7 @@
     }
 
     // Render Data to Table
+    // Render Data to Table (SUDAH DIPERBAIKI DARI BUG INDEX FILTER)
     function renderTable(data) {
       const tbody = document.getElementById('tableBody');
       tbody.innerHTML = '';
@@ -958,23 +959,26 @@
         return;
       }
 
-      data.forEach((item, index) => {
+      data.forEach((item) => {
+        // PERBAIKAN: Cari index asli item di catalogData agar tidak salah panggil saat difilter
+        const originalIndex = catalogData.findIndex(c => c.nomor === item.nomor);
+
         const row = document.createElement('tr');
         row.innerHTML = `
           <td><strong>#${item.nomor}</strong></td>
           <td>${item.nama_barang}</td>
           <td class="price-tag">${formatRupiah(item.harga_jual)}</td>
           <td>
-            <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" onclick="showLocationModal(${index})">
+            <button class="btn btn-secondary" style="padding: 0.4rem 0.75rem; font-size: 0.8rem;" onclick="showLocationModal(${originalIndex})">
               <i class="fa-solid fa-magnifying-glass-location" style="color: var(--primary);"></i> CEK
             </button>
           </td>
           <td style="text-align: center;" class="admin-only">
             <div class="action-btns" style="justify-content: center;">
-              <button class="btn-icon btn-edit" title="Edit" onclick="openEditModal(${index})">
+              <button class="btn-icon btn-edit" title="Edit" onclick="openEditModal(${originalIndex})">
                 <i class="fa-solid fa-pen-to-square"></i>
               </button>
-              <button class="btn-icon btn-delete" title="Hapus" onclick="deleteItem(${index})">
+              <button class="btn-icon btn-delete" title="Hapus" onclick="deleteItem(${originalIndex})">
                 <i class="fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -1122,12 +1126,15 @@
     }
 	
 	// Controller Modal Detail Lokasi
+    // Controller Modal Detail Lokasi
     function showLocationModal(index) {
       const item = catalogData[index];
+      if (!item) return;
+
       document.getElementById('locModalItemName').innerText = item.nama_barang;
       
       const locText = item.lokasi_barang && item.lokasi_barang !== '-' ? item.lokasi_barang : 'Belum diatur';
-      document.getElementById('locModalText').innerText = `${item.nama_barang} disimpan di: ${locText}`;
+      document.getElementById('locModalText').innerText = `${locText}`;
       
       document.getElementById('locationModal').classList.add('active');
     }
